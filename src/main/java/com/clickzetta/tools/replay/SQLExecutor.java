@@ -7,6 +7,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -15,14 +16,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class SQLExecutor {
-    private final Config config;
-    private HikariDataSource dataSource;
-    private final ScheduledExecutorService executor;
-
-    private long startTime = 0;
-
-    private final SQLOutput sqlOutput;
-
+    protected final Config config;
+    protected HikariDataSource dataSource;
+    protected final ScheduledExecutorService executor;
+    protected final SQLOutput sqlOutput;
 
     public SQLExecutor(Config config) throws FileNotFoundException {
         this.config = config;
@@ -43,29 +40,17 @@ public class SQLExecutor {
         dataSource = new HikariDataSource(hc);
     }
 
-    public void execute(final SQLProperty sql) {
-        synchronized (this) {
-            if (startTime == 0) {
-                startTime = sql.getStartTime();
-            } else {
-                if (sql.getStartTime() < startTime) {
-                    startTime = sql.getStartTime();
-                }
-            }
-        }
-        long delay = 0;
-        if (!config.isWithoutDelay()) {
-            delay = (sql.getStartTime() - startTime) / config.getReplayRate();
-        }
+    void executeInternal(final SQLProperty sql, long delay) {
         executor.schedule(new Runnable() {
             @SneakyThrows
             @Override
             public void run() {
-                String record;
                 String jobId = CZRequestIdGenerator.getInstance().generate();
                 Connection connection = dataSource.getConnection();
+                long startTime = System.currentTimeMillis();
+                sql.setStartTime(startTime);
+                sql.setJobId(jobId);
                 try {
-                    long startTime = System.currentTimeMillis();
                     System.out.println("sql:" + jobId);
                     String comment = "/* " + sql.getViewId() + "-" + sql.getSqlId() + " */";
                     Statement statement = connection.createStatement();
@@ -75,48 +60,19 @@ public class SQLExecutor {
                     while (resultSet.next()) {
                         count++;
                     }
-                    long elapsedTime = System.currentTimeMillis() - startTime;
-                    record = sql.getViewId() + "," + sql.getSqlId() + "," + jobId + ","
-                                + startTime + "," + elapsedTime + ","
-                                + sql.getStartTime() + "," + sql.getElapsedTime() + "," + count + "\n";
+                    sql.setElapsedTime(System.currentTimeMillis() - startTime);
+                    sql.setResultCount(count);
                     czStatement.close();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    long elapsedTime = System.currentTimeMillis() - startTime;
-                    record = sql.getViewId() + "," + sql.getSqlId() + "," + jobId + ","
-                            + startTime + "," + elapsedTime + ","
-                            + sql.getStartTime() + "," + sql.getElapsedTime() + ",FAILED" + "\n";
+                    sql.setElapsedTime(System.currentTimeMillis() - startTime);
                 } finally {
                     connection.close();
                 }
-                sqlOutput.write(record);
+                sqlOutput.write(sql.toString() + "\n");
             }
         }, delay, TimeUnit.MILLISECONDS);
     }
 
-
-    public void checkWait() throws InterruptedException {
-        while (((ScheduledThreadPoolExecutor)executor).getQueue().size() >= ((ScheduledThreadPoolExecutor) executor).getPoolSize()) {
-            try {
-                System.out.println("wait for queue size: " + ((ScheduledThreadPoolExecutor)executor).getQueue().size());
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw e;
-            }
-        }
-    }
-
-    public void close() throws Exception {
-        executor.shutdown();
-        boolean isDown = false;
-        while (!isDown) {
-            try {
-                isDown = executor.awaitTermination(5, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        dataSource.close();
-        sqlOutput.close();
-    }
+    void execute() throws Exception {}
 }

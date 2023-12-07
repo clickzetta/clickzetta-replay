@@ -10,16 +10,9 @@ public class ReplaySQL {
         CommandLine cmd = parseCmdParameters(args);
         Config config = loadConfigFile(cmd);
 
-        SQLExecutor executor = new SQLExecutor(config);
-        SQLParser parser = new SQLParser(cmd.getOptionValue("file"));
+        SQLExecutor executor = SQLExecutorFactory.getExecutor(config);
 
-        SQLProperty sqlProperty;
-        while ((sqlProperty = parser.getSQL()) !=null) {
-            executor.execute(sqlProperty);
-        }
-
-        parser.close();
-        executor.close();
+        executor.execute();
     }
 
     private static CommandLine parseCmdParameters(String[] args) {
@@ -32,7 +25,7 @@ public class ReplaySQL {
                 .addOption(Option.builder()
                         .option("f").longOpt("file")
                         .desc("input data file")
-                        .hasArg(true).required(true)
+                        .hasArg(true).required(false)
                         .build())
                 .addOption(Option.builder()
                         .option("c").longOpt("config")
@@ -57,6 +50,11 @@ public class ReplaySQL {
                 .addOption(Option.builder()
                         .option("o").longOpt("output")
                         .desc("output file")
+                        .hasArg(true).required(false)
+                        .build())
+                .addOption(Option.builder()
+                        .option("ot").longOpt("output timeout")
+                        .desc("sql output timeout")
                         .hasArg(true).required(false)
                         .build());
 
@@ -88,10 +86,12 @@ public class ReplaySQL {
         config.setUsername(prop.getProperty("username"));
         config.setPassword(prop.getProperty("password"));
         config.setDriverClass(prop.getProperty("driver"));
+        config.setInputFile(cmd.getOptionValue("file"));
         config.setThreadCount(Integer.parseInt(cmd.getOptionValue("thread", "1")));
         config.setReplayRate(Integer.parseInt(cmd.getOptionValue("rate", "1")));
         config.setOutputFile(cmd.getOptionValue("output", "output.txt"));
         config.setWithoutDelay(cmd.hasOption("without delay"));
+        config.setOutputTimeout(Integer.parseInt(cmd.getOptionValue("output timeout", "30000")));
         reader.close();
         return config;
     }

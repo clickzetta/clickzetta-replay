@@ -25,8 +25,14 @@ public class Config {
     private int replayRate;
     @Getter
     @Setter
+    private String inputFile;
+    @Getter
+    @Setter
     private String outputFile;
     @Getter
     @Setter
     private boolean withoutDelay;
+    @Getter
+    @Setter
+    private int outputTimeout;
 }

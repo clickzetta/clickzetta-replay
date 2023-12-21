@@ -35,4 +35,7 @@ public class Config {
     @Getter
     @Setter
     private int outputTimeout;
+    @Getter
+    @Setter
+    private int serverPort;
 }

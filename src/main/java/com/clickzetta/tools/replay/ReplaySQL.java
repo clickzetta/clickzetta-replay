@@ -56,6 +56,11 @@ public class ReplaySQL {
                         .option("ot").longOpt("output timeout")
                         .desc("sql output timeout")
                         .hasArg(true).required(false)
+                        .build())
+                .addOption(Option.builder()
+                        .option("p").longOpt("port")
+                        .desc("replay server port")
+                        .hasArg(true).required(false)
                         .build());
 
         CommandLineParser parser = new DefaultParser();
@@ -92,6 +97,7 @@ public class ReplaySQL {
         config.setOutputFile(cmd.getOptionValue("output", "output.txt"));
         config.setWithoutDelay(cmd.hasOption("without delay"));
         config.setOutputTimeout(Integer.parseInt(cmd.getOptionValue("output timeout", "30000")));
+        config.setServerPort(Integer.parseInt(cmd.getOptionValue("port", "28082")));
         reader.close();
         return config;
     }

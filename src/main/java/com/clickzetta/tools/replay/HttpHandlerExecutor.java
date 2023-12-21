@@ -20,6 +20,7 @@ public class HttpHandlerExecutor extends SQLExecutor {
     private final HttpServer httpServer;
     protected Map<String, SQLProperty> sqlPropertyMap = new ConcurrentHashMap<>();
     ConcurrentLinkedQueue<SQLProperty> sqlQueue = new ConcurrentLinkedQueue<>();
+
     Thread thread = new Thread(new Runnable() {
         @Override
         public void run() {
@@ -49,7 +50,7 @@ public class HttpHandlerExecutor extends SQLExecutor {
 
     public HttpHandlerExecutor(Config config) throws IOException {
         super(config);
-        httpServer = HttpServer.create(new InetSocketAddress(28082), 0);
+        httpServer = HttpServer.create(new InetSocketAddress(config.getServerPort()), 0);
         httpServer.createContext("/submitSQL", new SubmitSQLHandler(this));
         httpServer.createContext("/updateSQL", new UpdateSQLHandler(this));
         httpServer.setExecutor(Executors.newFixedThreadPool(config.getThreadCount()));

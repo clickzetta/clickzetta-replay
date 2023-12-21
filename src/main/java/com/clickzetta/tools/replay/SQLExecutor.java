@@ -64,7 +64,11 @@ public class SQLExecutor {
                     sql.setResultCount(count);
                     czStatement.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    if (e.getMessage().contains("resultSet is null")) {
+                        sql.setResultCount(0);
+                    } else {
+                        e.printStackTrace();
+                    }
                     sql.setElapsedTime(System.currentTimeMillis() - startTime);
                 } finally {
                     connection.close();

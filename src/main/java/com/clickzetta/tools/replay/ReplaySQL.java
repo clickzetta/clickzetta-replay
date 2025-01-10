@@ -61,6 +61,16 @@ public class ReplaySQL {
                         .option("p").longOpt("port")
                         .desc("replay server port")
                         .hasArg(true).required(false)
+                        .build())
+                .addOption(Option.builder()
+                        .option("d").longOpt("dynamic mode")
+                        .desc("dynamic mode")
+                        .hasArg(false).required(false)
+                        .build())
+                .addOption(Option.builder()
+                        .option("s").longOpt("sleep interval")
+                        .desc("sleep interval ms")
+                        .hasArg(true).required(false)
                         .build());
 
         CommandLineParser parser = new DefaultParser();
@@ -98,6 +108,8 @@ public class ReplaySQL {
         config.setWithoutDelay(cmd.hasOption("without delay"));
         config.setOutputTimeout(Integer.parseInt(cmd.getOptionValue("output timeout", "30000")));
         config.setServerPort(Integer.parseInt(cmd.getOptionValue("port", "28082")));
+        config.setDynamicMode(cmd.hasOption("dynamic mode"));
+        config.setSleepInterval(Integer.parseInt(cmd.getOptionValue("sleep interval", "100")));
         reader.close();
         return config;
     }

@@ -21,7 +21,6 @@ public class LocalFileExecutor extends SQLExecutor {
 
     private final LocalFileParser parser;
 
-
     public LocalFileExecutor(Config config) throws FileNotFoundException {
         super(config);
         parser = new LocalFileParser(config);
@@ -30,7 +29,9 @@ public class LocalFileExecutor extends SQLExecutor {
     @Override
     public void execute() throws Exception {
         SQLProperty sqlProperty;
+        long lastStartTime = 0;
         while ((sqlProperty = parser.getSQL()) !=null) {
+            long delay = 0;
             synchronized (this) {
                 if (startTime == 0) {
                     startTime = sqlProperty.getOriginStartTime();
@@ -40,11 +41,27 @@ public class LocalFileExecutor extends SQLExecutor {
                     }
                 }
             }
-            long delay = 0;
-            if (!config.isWithoutDelay()) {
-                delay = (sqlProperty.getOriginStartTime() - startTime) / config.getReplayRate();
+            if (lastStartTime == 0) {
+                lastStartTime = startTime;
+            }
+            if (config.isDynamicMode()) {
+                long alreadySleep = 0;
+                while (activeTasks.get() > 0) {
+                    if (sqlProperty.getOriginStartTime() - lastStartTime <= alreadySleep) {
+                        break;
+                    }
+                    Thread.sleep(config.getSleepInterval());
+                    alreadySleep += config.getSleepInterval();
+                }
+            } else {
+                if (!config.isWithoutDelay()) {
+                    if (activeTasks.get() > 0) {
+                        delay = (sqlProperty.getOriginStartTime() - startTime) / config.getReplayRate();
+                    }
+                }
             }
             executeInternal(sqlProperty, delay);
+            lastStartTime = sqlProperty.getOriginStartTime();
         }
         close();
     }

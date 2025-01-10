@@ -14,12 +14,15 @@ import java.sql.Statement;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SQLExecutor {
     protected final Config config;
     protected HikariDataSource dataSource;
     protected final ScheduledExecutorService executor;
     protected final SQLOutput sqlOutput;
+
+    protected final AtomicInteger activeTasks = new AtomicInteger(0);
 
     public SQLExecutor(Config config) throws FileNotFoundException {
         this.config = config;
@@ -45,6 +48,7 @@ public class SQLExecutor {
             @SneakyThrows
             @Override
             public void run() {
+                activeTasks.incrementAndGet();
                 String jobId = CZRequestIdGenerator.getInstance().generate();
                 Connection connection = dataSource.getConnection();
                 long startTime = System.currentTimeMillis();
@@ -72,6 +76,7 @@ public class SQLExecutor {
                     sql.setElapsedTime(System.currentTimeMillis() - startTime);
                 } finally {
                     connection.close();
+                    activeTasks.decrementAndGet();
                 }
                 sqlOutput.write(sql.toString() + "\n");
             }

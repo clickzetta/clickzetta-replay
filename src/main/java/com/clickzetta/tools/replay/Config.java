@@ -38,4 +38,10 @@ public class Config {
     @Getter
     @Setter
     private int serverPort;
+    @Getter
+    @Setter
+    private boolean dynamicMode;
+    @Getter
+    @Setter
+    private int sleepInterval;
 }

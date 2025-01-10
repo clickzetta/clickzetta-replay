@@ -12,6 +12,7 @@ public class SQLOutput {
 
     public synchronized void write(String sql) throws Exception {
         outputStream.write(sql.getBytes());
+        outputStream.flush();
     }
 
     public void close() throws Exception {

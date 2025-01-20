@@ -15,7 +15,7 @@ st.set_page_config(
 csv = st.text_input('csv file:')
 if csv:
     df = pd.read_csv(csv)
-    df['comparison'] = df['holo'] / df['cz'] * 100
+    df['comparison'] = df['original'] / df['cz'] * 100
     total = len(df)
     df_succeed = df[df['rs_cnt'] != 'FAILED'].sort_values('comparison').reset_index(drop=True).reset_index()
     succeed = len(df_succeed)
@@ -27,7 +27,7 @@ if csv:
     if not df_succeed.empty:
         tooltip=[alt.Tooltip('job_id', title='job_id'),
                  alt.Tooltip('cz', title='cz exec time (ms)'),
-                 alt.Tooltip('holo', title='holo exec time (ms)'),
+                 alt.Tooltip('original', title='original exec time (ms)'),
                  alt.Tooltip('comparison:Q', title='comparison(%)', format='.2f'),]
         c = alt.layer(
             alt.Chart(df_succeed).mark_bar(width=1, align='left').encode(
@@ -37,7 +37,7 @@ if csv:
                 tooltip=tooltip,
             ) +
             alt.Chart(df_succeed).mark_bar(width=1, align='right').encode(
-                y=alt.Y('holo:Q', title='execution time(ms)'),
+                y=alt.Y('original:Q', title='execution time(ms)'),
                 x=alt.X('index:Q'),
                 color=alt.value('salmon'),
                 tooltip=tooltip,

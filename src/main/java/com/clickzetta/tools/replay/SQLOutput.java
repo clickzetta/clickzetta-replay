@@ -9,7 +9,7 @@ public class SQLOutput {
 
     public SQLOutput(Config config) throws IOException {
         outputStream = new FileOutputStream(config.getOutputFile());
-        outputStream.write("slide_id,id,job_id,cz_start_time,cz,holo_start_time,holo,rs_cnt\n".getBytes());
+        outputStream.write("slide_id,id,job_id,cz_start_time,cz,original_start_time,original,rs_cnt\n".getBytes());
     }
 
     public synchronized void write(String sql) throws Exception {

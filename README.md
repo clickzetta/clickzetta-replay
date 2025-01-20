@@ -1,6 +1,8 @@
 # ClickZetta Replay
 clickzetta的sql重放工具
 
+![image](https://github.com/user-attachments/assets/633843c8-a28b-4514-ab40-1cae6c505637)
+
 ## 编译
 ```shell
 mvn clean package
@@ -42,3 +44,13 @@ view_id:1234567892 id:1234569 start_time:1701216063554 elapsed_time:214 sql: sel
 3023880575222212,3054803401671177,2023120410152119261v2hkb7xxxxx,1701656121200,27584,1701216058985,241,0
 ```
 > http请求重放的sql输出结果和上述文件格式一致，只是view_id字段为pg sql发起的途径，id为pg sql的序列id，这二者均不保证唯一性
+
+## 输出文件可视化
+
+```
+cd streamlit
+pip install -r requirements.txt
+streamlit run main.py
+```
+
+页面文本框中输入 replay 工具的输出文件路径

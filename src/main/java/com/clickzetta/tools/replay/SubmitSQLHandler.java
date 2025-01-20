@@ -23,7 +23,7 @@ public class SubmitSQLHandler implements HttpHandler {
         String paramStr = getParam(exchange);
         HttpHandlerParser httpHandlerParser = new HttpHandlerParser(paramStr);
         SQLProperty sqlProperty = httpHandlerParser.getSQL();
-        sqlExecutor.executeInternal(sqlProperty, 0);
+        sqlExecutor.executeInternal(sqlProperty, 0, 0, 0);
         ((HttpHandlerExecutor) sqlExecutor).sqlPropertyMap.compute(sqlProperty.getUniqueKey(), (k, v) -> {
             if (v == null) {
                 return sqlProperty;

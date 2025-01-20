@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +26,7 @@ public class SQLExecutor {
 
     protected final AtomicInteger activeTasks = new AtomicInteger(0);
 
-    public SQLExecutor(Config config) throws FileNotFoundException {
+    public SQLExecutor(Config config) throws IOException {
         this.config = config;
         initDataSource(config);
         executor = new ScheduledThreadPoolExecutor(config.getThreadCount());
@@ -43,7 +45,7 @@ public class SQLExecutor {
         dataSource = new HikariDataSource(hc);
     }
 
-    void executeInternal(final SQLProperty sql, long delay) {
+    void executeInternal(final SQLProperty sql, long delay, long currentIndex, long totalCount) {
         executor.schedule(new Runnable() {
             @SneakyThrows
             @Override
@@ -55,7 +57,7 @@ public class SQLExecutor {
                 sql.setStartTime(startTime);
                 sql.setJobId(jobId);
                 try {
-                    System.out.println("sql:" + jobId);
+                    System.out.println("sql:" + jobId + "    " + currentIndex + "/" + totalCount);
                     String comment = "/* " + sql.getViewId() + "-" + sql.getSqlId() + " */";
                     Statement statement = connection.createStatement();
                     CZStatement czStatement = statement.unwrap(CZStatement.class);

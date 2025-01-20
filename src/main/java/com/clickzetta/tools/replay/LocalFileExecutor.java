@@ -21,7 +21,7 @@ public class LocalFileExecutor extends SQLExecutor {
 
     private final LocalFileParser parser;
 
-    public LocalFileExecutor(Config config) throws FileNotFoundException {
+    public LocalFileExecutor(Config config) throws IOException {
         super(config);
         parser = new LocalFileParser(config);
     }
@@ -30,6 +30,7 @@ public class LocalFileExecutor extends SQLExecutor {
     public void execute() throws Exception {
         SQLProperty sqlProperty;
         long lastStartTime = 0;
+        long totalCount = parser.getTotalCount();
         while ((sqlProperty = parser.getSQL()) !=null) {
             long delay = 0;
             synchronized (this) {
@@ -60,7 +61,7 @@ public class LocalFileExecutor extends SQLExecutor {
                     }
                 }
             }
-            executeInternal(sqlProperty, delay);
+            executeInternal(sqlProperty, delay, parser.getCurrentSqlIndex(), totalCount);
             lastStartTime = sqlProperty.getOriginStartTime();
         }
         close();

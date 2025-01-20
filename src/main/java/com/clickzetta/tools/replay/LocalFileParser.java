@@ -1,19 +1,30 @@
 package com.clickzetta.tools.replay;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LocalFileParser implements SQLParser {
-    private final LocalFileReader reader;
+    private final List<String> sqlList = new ArrayList<>();
+    private int index;
 
-    public LocalFileParser(Config config) throws FileNotFoundException {
-        reader = new LocalFileReader(config.getInputFile());
+    public LocalFileParser(Config config) throws IOException {
+        LocalFileReader reader = new LocalFileReader(config.getInputFile());
+        String sql;
+        while ((sql = reader.getLine()) != null) {
+            sqlList.add(sql);
+        }
+        index = 0;
     }
 
     @Override
     public SQLProperty getSQL() throws IOException {
-        String line = reader.getLine();
+        if (index >= sqlList.size()) {
+            return null;
+        }
+        String line = sqlList.get(index++);
         if (line == null) {
             return null;
         }
@@ -38,6 +49,13 @@ public class LocalFileParser implements SQLParser {
 
     @Override
     public void close() throws IOException {
-        reader.close();
+    }
+
+    public long getCurrentSqlIndex() {
+        return index;
+    }
+
+    public long getTotalCount() {
+        return sqlList.size();
     }
 }

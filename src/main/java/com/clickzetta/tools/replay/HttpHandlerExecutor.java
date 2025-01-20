@@ -63,7 +63,7 @@ public class HttpHandlerExecutor extends SQLExecutor {
     }
 
     @Override
-    void executeInternal(final SQLProperty sql, long delay) {
+    void executeInternal(final SQLProperty sql, long delay, long currentIndex, long totalCount) {
         executor.schedule(new Runnable() {
             @SneakyThrows
             @Override

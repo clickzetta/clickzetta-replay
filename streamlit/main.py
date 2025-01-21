@@ -12,17 +12,35 @@ st.set_page_config(
     }
 )
 
-csv = st.text_input('csv file:')
+col0, col1 = st.columns(2)
+csv = col0.text_input('csv file:')
+sort_by = col1.selectbox('sort by', ['cz', 'original', 'comparison', 'job_id'], index=2)
 if csv:
     df = pd.read_csv(csv)
     df['comparison'] = df['original'] / df['cz'] * 100
     total = len(df)
-    df_succeed = df[df['rs_cnt'] != 'FAILED'].sort_values('comparison').reset_index(drop=True).reset_index()
+    df_succeed = df[df['rs_cnt'] != 'FAILED'].sort_values(sort_by).reset_index(drop=True).reset_index()
     succeed = len(df_succeed)
     df_faster = df[df['comparison'] >= 100]
     faster = len(df_faster)
 
-    st.code(f'Total: {total}\tSucceed: {succeed} ({succeed/total*100:.2f}%)\tFaster: {faster} ({faster/total*100:.2f}%)')
+    cz_stat = f'Avg: {df_succeed.cz.mean():.2f}\tP50: {df_succeed.cz.quantile(0.5):.2f}\tP95: {df_succeed.cz.quantile(0.75):.2f}\tP90: {df_succeed.cz.quantile(0.9):.2f}\tP95: {df_succeed.cz.quantile(0.95):.2f}\tP99: {df_succeed.cz.quantile(0.99):.2f}'
+    cz_stat = '\t'.join([f'Avg: {df_succeed.cz.mean():.2f}',
+                         f'P50: {df_succeed.cz.quantile(0.5):.2f}',
+                         f'P75: {df_succeed.cz.quantile(0.75):.2f}',
+                         f'P90: {df_succeed.cz.quantile(0.9):.2f}',
+                         f'P95: {df_succeed.cz.quantile(0.95):.2f}',
+                         f'P99: {df_succeed.cz.quantile(0.99):.2f}'])
+    ori_stat = '\t'.join([f'Avg: {df_succeed.original.mean():.2f}',
+                          f'P50: {df_succeed.original.quantile(0.5):.2f}',
+                          f'P75: {df_succeed.original.quantile(0.75):.2f}',
+                          f'P90: {df_succeed.original.quantile(0.9):.2f}',
+                          f'P95: {df_succeed.original.quantile(0.95):.2f}',
+                          f'P99: {df_succeed.original.quantile(0.99):.2f}'])
+    st.code(f'''Total: {total}\tSucceed: {succeed} ({succeed/total*100:.2f}%)\tFaster: {faster} ({faster/total*100:.2f}%)
+Stats:
+Clickzetta\t{cz_stat}
+Original  \t{ori_stat}''')
 
     if not df_succeed.empty:
         tooltip=[alt.Tooltip('job_id', title='job_id'),
@@ -32,7 +50,7 @@ if csv:
         c = alt.layer(
             alt.Chart(df_succeed).mark_bar(width=1, align='left').encode(
                 y=alt.Y('cz:Q', title=f'execution time(ms)'),
-                x=alt.X('index:Q'),
+                x=alt.X('index:Q', title=None),
                 color=alt.value('steelblue'),
                 tooltip=tooltip,
             ) +

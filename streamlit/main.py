@@ -4,7 +4,7 @@ import altair as alt
 
 st.set_page_config(
     page_title="ClickZetta Replay Result Viewer",
-    # page_icon=icon,
+    page_icon=":material/play_arrow:",
     layout="wide",
     # initial_sidebar_state="expanded",
     menu_items = {
@@ -14,7 +14,7 @@ st.set_page_config(
 
 col0, col1 = st.columns(2)
 csv = col0.text_input('csv file:')
-sort_by = col1.selectbox('sort by', ['cz', 'original', 'comparison', 'job_id'], index=2)
+sort_by = col1.selectbox('sort by', ['cz', 'original', 'comparison', 'id'], index=2)
 if csv:
     df = pd.read_csv(csv)
     df['comparison'] = df['original'] / df['cz'] * 100
@@ -43,7 +43,9 @@ Clickzetta\t{cz_stat}
 Original  \t{ori_stat}''')
 
     if not df_succeed.empty:
-        tooltip=[alt.Tooltip('job_id', title='job_id'),
+        tooltip=[alt.Tooltip('index', title='index'),
+                 alt.Tooltip('id', title='id'),
+                 alt.Tooltip('job_id', title='cz job id'),
                  alt.Tooltip('cz', title='cz exec time (ms)'),
                  alt.Tooltip('original', title='original exec time (ms)'),
                  alt.Tooltip('comparison:Q', title='comparison(%)', format='.2f'),]

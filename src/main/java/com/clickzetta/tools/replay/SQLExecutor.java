@@ -72,6 +72,8 @@ public class SQLExecutor {
                 } catch (Exception e) {
                     if (e.getMessage().contains("resultSet is null")) {
                         sql.setResultCount(0);
+                    } else if (e.getMessage().contains("cancelled")) {
+                        sql.setResultCount(-2);
                     } else {
                         e.printStackTrace();
                     }

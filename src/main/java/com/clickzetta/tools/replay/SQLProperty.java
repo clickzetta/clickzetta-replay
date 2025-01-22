@@ -54,6 +54,8 @@ public class SQLProperty {
                         + "," + originElapsedTime + ",";
         if (resultCount == -1) {
             res += "FAILED";
+        } else if (resultCount == -2) {
+            res += "CANCELED";
         } else {
             res += resultCount;
         }

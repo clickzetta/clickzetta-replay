@@ -33,11 +33,12 @@ driver=com.clickzetta.client.jdbc.ClickZettaDriver
 ```
 
 ## 待重放SQL文件
-> category字段为源sql所属的分类, id为源sql的唯一id
+> category字段为源sql所属的分类(若无可留空), id为源sql的唯一id
 ```sql
 category:1234567890 id:1234567 start_time:1701216058985 elapsed_time:241 sql: select 1;
 category:1234567891 id:1234568 start_time:1701216061630 elapsed_time:231 sql: select 2;
 category:1234567892 id:1234569 start_time:1701216063554 elapsed_time:214 sql: select 3;
+category: id:1234570 start_time:1701216064554 elapsed_time:314 sql: select 4;
 ```
 
 ## 输出文件

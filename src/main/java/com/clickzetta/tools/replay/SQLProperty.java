@@ -55,7 +55,7 @@ public class SQLProperty {
         if (resultCount == -1) {
             res += "FAILED";
         } else if (resultCount == -2) {
-            res += "CANCELED";
+            res += "CANCELLED";
         } else {
             res += resultCount;
         }

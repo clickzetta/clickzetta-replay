@@ -34,11 +34,22 @@ driver=com.clickzetta.client.jdbc.ClickZettaDriver
 
 ## 待重放SQL文件
 > category字段为源sql所属的分类(若无可留空), id为源sql的唯一id
+> 支持两种格式的待重放文件，一种是指定内容格式的文件，一种是标准csv，两种格式中字段顺序一致
+
+指定内容格式:
 ```sql
 category:1234567890 id:1234567 start_time:1701216058985 elapsed_time:241 sql: select 1;
 category:1234567891 id:1234568 start_time:1701216061630 elapsed_time:231 sql: select 2;
 category:1234567892 id:1234569 start_time:1701216063554 elapsed_time:214 sql: select 3;
 category: id:1234570 start_time:1701216064554 elapsed_time:314 sql: select 4;
+```
+
+csv格式:
+```csv
+1234567890,1234567,1701216058985,241,select 1;
+1234567891,1234568,1701216061630,231,select 2;
+1234567892,1234569,1701216063554,214,select 3;
+,1234570,1701216064554,314,select 4;
 ```
 
 ## 输出文件

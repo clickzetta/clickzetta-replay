@@ -78,7 +78,7 @@ public class HttpHandlerExecutor extends SQLExecutor {
                 sql.setJobId(jobId);
                 try {
                     System.out.println("job:" + jobId);
-                    String comment = "/* " + sql.getViewId() + "-" + sql.getSqlId() + " */";
+                    String comment = "/* " + sql.getCategory() + "-" + sql.getSqlId() + " */";
                     Statement statement = connection.createStatement();
                     CZStatement czStatement = statement.unwrap(CZStatement.class);
                     ResultSet resultSet = czStatement.executeQuery(comment + sql.getSql(), jobId);

@@ -18,7 +18,7 @@ public class SQLProperty {
 
     @Getter
     @Setter
-    private String viewId;
+    private String category;
 
     @Getter
     @Setter
@@ -45,12 +45,12 @@ public class SQLProperty {
     private String jobId;
 
     public String getUniqueKey() {
-        return viewId + "_" + sqlId;
+        return category + "_" + sqlId;
     }
 
     @Override
     public String toString() {
-        String res = viewId + "," + sqlId + "," + jobId + "," + startTime + "," + elapsedTime + "," + originStartTime
+        String res = category + "," + sqlId + "," + jobId + "," + startTime + "," + elapsedTime + "," + originStartTime
                         + "," + originElapsedTime + ",";
         if (resultCount == -1) {
             res += "FAILED";

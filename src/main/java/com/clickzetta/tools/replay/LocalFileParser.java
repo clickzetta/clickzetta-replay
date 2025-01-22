@@ -32,7 +32,7 @@ public class LocalFileParser implements SQLParser {
             return getSQL();
         }
 
-        Pattern pattern = Pattern.compile("view_id:(.*) id:(.*) start_time:(.*) elapsed_time:(.*) sql:(.*)");
+        Pattern pattern = Pattern.compile("category:(.*) id:(.*) start_time:(.*) elapsed_time:(.*) sql:(.*)");
         Matcher matcher = pattern.matcher(line);
         if (matcher.matches()) {
             SQLProperty sqlProperty = new SQLProperty();
@@ -40,7 +40,7 @@ public class LocalFileParser implements SQLParser {
             sqlProperty.setSqlId(matcher.group(2));
             sqlProperty.setOriginStartTime(Long.parseLong(matcher.group(3)));
             sqlProperty.setOriginElapsedTime(Long.parseLong(matcher.group(4)));
-            sqlProperty.setSql(SQLConverter.convert(matcher.group(5)));
+            sqlProperty.setSql(matcher.group(5));
             return sqlProperty;
         } else {
             throw new RuntimeException("sql file format error");

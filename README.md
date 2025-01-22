@@ -16,6 +16,8 @@ java -jar clickzetta-replay-1.0-SNAPSHOT.jar -t <线程数> -r <重放速率> -f
 -w: 重放sql间不执行delay操作
 -p: http server监听端口
 -ot: sql结果输出超时时间（默认30s）
+-d dynamic mode (重放时过滤空闲时间，带负载的窗口不变)
+-s sleep interval (检查空闲时间窗口的时间粒度，默认100ms)
 -h: 帮助
 ```
 本工具支持两种模式，一种是离线工具模式，一种是http server模式。离线工具模式下，需要指定`-f`参数，指定待重放sql文件，
@@ -31,19 +33,20 @@ driver=com.clickzetta.client.jdbc.ClickZettaDriver
 ```
 
 ## 待重放SQL文件
+> category字段为源sql所属的分类, id为源sql的唯一id
 ```sql
-view_id:1234567890 id:1234567 start_time:1701216058985 elapsed_time:241 sql: select 1;
-view_id:1234567891 id:1234568 start_time:1701216061630 elapsed_time:231 sql: select 2;
-view_id:1234567892 id:1234569 start_time:1701216063554 elapsed_time:214 sql: select 3;
+category:1234567890 id:1234567 start_time:1701216058985 elapsed_time:241 sql: select 1;
+category:1234567891 id:1234568 start_time:1701216061630 elapsed_time:231 sql: select 2;
+category:1234567892 id:1234569 start_time:1701216063554 elapsed_time:214 sql: select 3;
 ```
 
 ## 输出文件
 ```
 # 重放结果
-# view_id, id, job_id, new_job_start_time, new_job_elapsed_time, origin_job_start_time, origin_job_elapsed_time, sql_result_count
+# category, id, job_id, new_job_start_time, new_job_elapsed_time, origin_job_start_time, origin_job_elapsed_time, sql_result_count
 3023880575222212,3054803401671177,2023120410152119261v2hkb7xxxxx,1701656121200,27584,1701216058985,241,0
 ```
-> http请求重放的sql输出结果和上述文件格式一致，只是view_id字段为pg sql发起的途径，id为pg sql的序列id，这二者均不保证唯一性
+> http请求重放的sql输出结果和上述文件格式一致，category字段为源sql所属的分类，id为源sql的唯一id
 
 ## 输出文件可视化
 

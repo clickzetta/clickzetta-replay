@@ -18,7 +18,7 @@ public class HttpHandlerParser implements SQLParser {
         SQLProperty sqlProperty = new SQLProperty();
         sqlProperty.setViewId(sqlRecord.getAction());
         sqlProperty.setSqlId(String.valueOf(sqlRecord.getSequenceId()));
-        sqlProperty.setSql(SQLConverter.convert(sqlRecord.getSql()));
+        sqlProperty.setSql(sqlRecord.getSql());
         sqlProperty.setOriginStartTime(sqlRecord.getStartTime());
         sqlProperty.setOriginElapsedTime(sqlRecord.getElapsedTime());
         sqlProperty.setOriginResultCount(sqlRecord.getResultCount());

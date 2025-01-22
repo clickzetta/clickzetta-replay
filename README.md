@@ -33,7 +33,7 @@ driver=com.clickzetta.client.jdbc.ClickZettaDriver
 ```
 
 ## 待重放SQL文件
-> category字段为源sql所属的分类(若无可留空), id为源sql的唯一id
+> category字段为源sql所属的分类(若无可留空), id为源sql的唯一id \
 > 支持两种格式的待重放文件，一种是指定内容格式的文件，一种是标准csv，两种格式中字段顺序一致
 
 指定内容格式:

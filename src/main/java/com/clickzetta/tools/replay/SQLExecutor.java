@@ -46,11 +46,11 @@ public class SQLExecutor {
     }
 
     void executeInternal(final SQLProperty sql, long delay, long currentIndex, long totalCount) {
+        activeTasks.incrementAndGet();
         executor.schedule(new Runnable() {
             @SneakyThrows
             @Override
             public void run() {
-                activeTasks.incrementAndGet();
                 String jobId = CZRequestIdGenerator.getInstance().generate();
                 Connection connection = dataSource.getConnection();
                 long startTime = System.currentTimeMillis();

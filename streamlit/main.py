@@ -21,11 +21,14 @@ if not csv:
     st.stop()
 
 df = pd.read_csv(csv)
-CATEGORY = 'category'
-if 'slide_id' in df.columns:
-    CATEGORY = 'slide_id'
-elif 'view_id' in df.columns:
-    CATEGORY = 'view_id'
+
+def first_column_in_df(target_df, list_of_col):
+    for c in list_of_col:
+        if c in target_df.columns:
+            return c
+    raise Exception(f'No column in {list_of_col} found in dataframe')
+
+CATEGORY = first_column_in_df(df, ['category', 'slide_id', 'view_id'])
 
 categories = df[CATEGORY].unique()
 df['comparison'] = df['original'] / df['cz'] * 100
@@ -53,7 +56,6 @@ if submitted:
     display_total = len(df)
     faster = len(df[df['comparison'] >= 100])
 
-    cz_stat = f'Avg: {df.cz.mean():.2f}\tP50: {df.cz.quantile(0.5):.2f}\tP95: {df.cz.quantile(0.75):.2f}\tP90: {df.cz.quantile(0.9):.2f}\tP95: {df.cz.quantile(0.95):.2f}\tP99: {df.cz.quantile(0.99):.2f}'
     cz_stat = '\t'.join([f'Avg: {df.cz.mean():.2f}',
                          f'P50: {df.cz.quantile(0.5):.2f}',
                          f'P75: {df.cz.quantile(0.75):.2f}',
@@ -89,7 +91,6 @@ Clickzetta\t{cz_stat}''')
                 tooltip=tooltip,
             )
             bar = cz_bar
-        ori_bar = None
         if 'original' in view_elements:
             ori_bar = alt.Chart(df).mark_bar(width=1, align='right').encode(
                 y=alt.Y('original:Q', title='execution time(ms)'),
@@ -99,6 +100,8 @@ Clickzetta\t{cz_stat}''')
             )
             if bar:
                 bar = bar + ori_bar
+            else:
+                bar = ori_bar
         comp_line = None
         if 'comparison' in view_elements:
             comp_line = alt.Chart(df).mark_line().encode(
